@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -25,7 +26,7 @@ class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DIFFCALLBACK) {
         holder.itemView.setOnClickListener {
             Bundle().apply {
                 putParcelableArrayList("List", ArrayList(currentList))
-                putInt("pos",holder.adapterPosition)
+                putInt("pos", holder.adapterPosition)
                 holder.itemView.findNavController()
                     .navigate(R.id.action_galleryFragment_to_viewPager2Fragment, this)
             }
@@ -35,13 +36,19 @@ class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DIFFCALLBACK) {
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+        val photoItem = getItem(position)
         holder.itemView.shimmerLayoutGallery.apply {
             setShimmerColor(0x75FFFFFF)
             setShimmerAngle(0)
             startShimmerAnimation()
         }
+        holder.itemView.imageView.layoutParams.height = photoItem.imageHigh
+        holder.photoFavorite.text = photoItem.favorites.toString()
+        holder.photoLikes.text = photoItem.likes.toString()
+        holder.photoUser.text = photoItem.user
+
         Glide.with(holder.itemView)
-            .load(getItem(position).previewURL)
+            .load(photoItem.previewURL)
             .placeholder(R.drawable.ic_photo_gray_24dp)
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
@@ -79,5 +86,7 @@ class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DIFFCALLBACK) {
 }
 
 class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
+    val photoUser = itemView.findViewById<TextView>(R.id.textViewUser)
+    val photoLikes = itemView.findViewById<TextView>(R.id.textViewLikes)
+    val photoFavorite = itemView.findViewById<TextView>(R.id.textViewFavorites)
 }

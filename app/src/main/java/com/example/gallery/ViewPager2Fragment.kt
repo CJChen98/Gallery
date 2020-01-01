@@ -9,20 +9,25 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.*
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.fragment_view_pager2.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.android.synthetic.main.viewpager_itme.*
+import kotlinx.android.synthetic.main.viewpager_itme.view.*
+import kotlinx.coroutines.*
 import java.io.IOException
 import java.io.OutputStream
 
@@ -58,7 +63,72 @@ class ViewPager2Fragment : Fragment() {
             }
         })
         viewpager2.setCurrentItem(arguments?.getInt("pos") ?: 0, false)
+        saveButton.setOnClickListener {
+            if (Build.VERSION.SDK_INT < 29 && ContextCompat.checkSelfPermission(
+                    requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
+            } else {
+                viewLifecycleOwner.lifecycleScope.launch { savePhoto() }
+            }
+        }
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            1 -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    viewLifecycleOwner.lifecycleScope.launch { savePhoto() }
+                } else {
+                    requireActivity().finish()
+                }
+            }
+        }
+    }
+
+    private suspend fun savePhoto() {
+        withContext(Dispatchers.IO) {
+            val holder =
+                (viewpager2[0] as RecyclerView).findViewHolderForAdapterPosition(viewpager2.currentItem)
+                        as MViewHolder
+            val photoItem = photoList?.get(viewpager2.currentItem)
+            val bitmap = holder.itemView.pagerPhoto.drawable.toBitmap(
+                photoItem?.imageWidth!!,
+                photoItem.imageHigh
+            )
+            val values = ContentValues().also {
+                it.put(MediaStore.Images.ImageColumns.RELATIVE_PATH, "Pictures/" + "Gallery")
+                //   it.put(MediaStore.Images.ImageColumns.DISPLAY_NAME,System.currentTimeMillis().toString()+".png")
+            }
+            val saveUri = requireContext().contentResolver.insert(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                values
+            ) ?: kotlin.run {
+                MainScope().launch {
+                    Toast.makeText(requireContext(), "Save Failed", Toast.LENGTH_SHORT).show()
+                }
+                return@withContext
+            }
+            requireContext().contentResolver.openOutputStream(saveUri).use {
+                if (bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)) {
+                    MainScope().launch {
+                        Toast.makeText(requireContext(), "Save Succeeded", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                } else {
+                    MainScope().launch {
+                        Toast.makeText(requireContext(), "Save Failed", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+        }
+    }
 
 }
