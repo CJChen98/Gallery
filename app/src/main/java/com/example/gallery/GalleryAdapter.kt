@@ -10,6 +10,7 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -19,23 +20,51 @@ import kotlinx.android.synthetic.main.gallery_item.view.*
 import java.util.ArrayList
 
 class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DIFFCALLBACK) {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        val holder = MyViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.gallery_item, parent, false)
-        )
-        holder.itemView.setOnClickListener {
-            Bundle().apply {
-                putParcelableArrayList("List", ArrayList(currentList))
-                putInt("pos", holder.adapterPosition)
-                holder.itemView.findNavController()
-                    .navigate(R.id.action_galleryFragment_to_viewPager2Fragment, this)
-            }
+    companion object {
+        const val NORMAL_VIEW_TYPE = 0
+        const val FOOTER_VIEW_TYPE = 1
+    }
 
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
+        val holder: MyViewHolder
+        if (viewType == NORMAL_VIEW_TYPE) {
+            holder = MyViewHolder(
+                LayoutInflater.from(parent.context).inflate(R.layout.gallery_item, parent, false)
+            )
+            holder.itemView.setOnClickListener {
+                Bundle().apply {
+                    putParcelableArrayList("List", ArrayList(currentList))
+                    putInt("pos", holder.adapterPosition)
+                    holder.itemView.findNavController()
+                        .navigate(R.id.action_galleryFragment_to_viewPager2Fragment, this)
+                }
+
+            }
+        } else {
+            holder = MyViewHolder(LayoutInflater.from(parent.context).inflate(
+                R.layout.gallery_footer,
+                parent,
+                false
+            ).also {
+                (it.layoutParams as StaggeredGridLayoutManager.LayoutParams).isFullSpan =
+                    true
+            })
         }
         return holder
     }
 
+    override fun getItemCount(): Int {
+        return super.getItemCount() + 1
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return if (position == itemCount - 1) FOOTER_VIEW_TYPE else NORMAL_VIEW_TYPE
+    }
+
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+        if (position == itemCount - 1) {
+            return
+        }
         val photoItem = getItem(position)
         holder.itemView.shimmerLayoutGallery.apply {
             setShimmerColor(0x75FFFFFF)

@@ -92,6 +92,7 @@ class ViewPager2Fragment : Fragment() {
         }
     }
 
+    @SuppressLint("InlinedApi")
     private suspend fun savePhoto() {
         withContext(Dispatchers.IO) {
             val holder =
