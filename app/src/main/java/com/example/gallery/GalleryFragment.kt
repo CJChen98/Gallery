@@ -2,17 +2,15 @@ package com.example.gallery
 
 
 import android.content.Context
-import android.opengl.Visibility
 import android.os.Bundle
 import android.os.Handler
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.SearchView
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import kotlinx.android.synthetic.main.fragment_gallery.*
 
@@ -36,9 +34,10 @@ class GalleryFragment : Fragment() {
         val sreachView = menu.findItem(R.id.app_bar_search).actionView as SearchView
         sreachView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                val string= query.toString().trim()
+                val string = query.toString().trim()
                 swipeLayoutGallery.isRefreshing = true
-                galleryViewModel.fetchData(string)
+                galleryViewModel.currentKey = string
+                galleryViewModel.resetQuery()
                 hideSoftInput(requireView())
                 return true
             }
@@ -53,7 +52,7 @@ class GalleryFragment : Fragment() {
         when (item.itemId) {
             R.id.swipe -> {
                 swipeLayoutGallery.isRefreshing = true
-                Handler().postDelayed(Runnable { galleryViewModel.fetchData() }, 1000)
+                Handler().postDelayed(Runnable { galleryViewModel.resetQuery() }, 1000)
             }
         }
         return super.onOptionsItemSelected(item)
@@ -62,30 +61,53 @@ class GalleryFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         setHasOptionsMenu(true)
-        val galleryAdapter = GalleryAdapter()
-        recyclerGallery.apply {
-            adapter = galleryAdapter
-            layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-        }
         galleryViewModel = ViewModelProvider(
             this,
             ViewModelProvider.AndroidViewModelFactory(requireActivity().application)
         ).get(GalleryViewModel::class.java)
+        val galleryAdapter = GalleryAdapter(galleryViewModel)
+        recyclerGallery.apply {
+            adapter = galleryAdapter
+            layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        }
 
         galleryViewModel.photoListLive.observe(this, Observer {
+            if (galleryViewModel.needToScrollToTop) {
+                recyclerGallery.scrollToPosition(0)
+                galleryViewModel.needToScrollToTop = false
+            }
             galleryAdapter.submitList(it)
             swipeLayoutGallery.isRefreshing = false
         })
-        galleryViewModel.photoListLive.value ?: galleryViewModel.fetchData()
+
+        galleryViewModel.dataStatusLive.observe(this, Observer {
+            galleryAdapter.footViewStatus = it
+            galleryAdapter.notifyItemChanged(galleryAdapter.itemCount - 1)
+            if (it == DATA_STATUS_NETWORK_ERROR) swipeLayoutGallery.isRefreshing = false
+        })
 
         swipeLayoutGallery.setOnRefreshListener {
             if (editText.text != null) {
                 val string = editText.text.toString()
-                galleryViewModel.fetchData(string)
+                galleryViewModel.currentKey = string
+                galleryViewModel.resetQuery()
             } else {
-                galleryViewModel.fetchData()
+                galleryViewModel.resetQuery()
             }
         }
+
+        recyclerGallery.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy < 0) return
+                val layoutManager = recyclerView.layoutManager as StaggeredGridLayoutManager
+                val intArray = IntArray(2)
+                layoutManager.findLastVisibleItemPositions(intArray)
+                if (intArray[0] == galleryAdapter.itemCount - 1) {
+                    galleryViewModel.fetchData()
+                }
+            }
+        })
     }
 
     fun hideSoftInput(v: View) {

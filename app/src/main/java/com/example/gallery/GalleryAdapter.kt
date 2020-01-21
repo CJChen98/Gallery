@@ -16,15 +16,18 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import kotlinx.android.synthetic.main.gallery_footer.view.*
 import kotlinx.android.synthetic.main.gallery_item.view.*
-import java.util.ArrayList
+import java.util.*
 
-class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DIFFCALLBACK) {
+class GalleryAdapter(val viewModel: GalleryViewModel) :
+    ListAdapter<PhotoItem, MyViewHolder>(DIFFCALLBACK) {
     companion object {
         const val NORMAL_VIEW_TYPE = 0
         const val FOOTER_VIEW_TYPE = 1
     }
 
+    var footViewStatus = DATA_STATUS_CAN_LOAD_MORE
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val holder: MyViewHolder
         if (viewType == NORMAL_VIEW_TYPE) {
@@ -46,8 +49,12 @@ class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DIFFCALLBACK) {
                 parent,
                 false
             ).also {
-                (it.layoutParams as StaggeredGridLayoutManager.LayoutParams).isFullSpan =
-                    true
+                (it.layoutParams as StaggeredGridLayoutManager.LayoutParams).isFullSpan = true
+                it.setOnClickListener { items ->
+                    items.progressBar.visibility = View.VISIBLE
+                    items.textView.text = "正在加载"
+                    viewModel.fetchData()
+                }
             })
         }
         return holder
@@ -63,6 +70,25 @@ class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DIFFCALLBACK) {
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         if (position == itemCount - 1) {
+            with(holder.itemView) {
+                when (footViewStatus) {
+                    DATA_STATUS_CAN_LOAD_MORE -> {
+                        progressBar.visibility = View.VISIBLE
+                        textView.text = "正在加载"
+                        isClickable = false
+                    }
+                    DATA_STATUS_NO_MORE -> {
+                        progressBar.visibility = View.GONE
+                        textView.text = "全部加载完毕"
+                        isClickable = false
+                    }
+                    DATA_STATUS_NETWORK_ERROR -> {
+                        progressBar.visibility = View.GONE
+                        textView.text = "网络错误,稍后再试"
+                        isClickable = true
+                    }
+                }
+            }
             return
         }
         val photoItem = getItem(position)
