@@ -1,4 +1,4 @@
-package com.example.gallery
+package cn.chitanda.gallery
 
 import org.junit.Test
 

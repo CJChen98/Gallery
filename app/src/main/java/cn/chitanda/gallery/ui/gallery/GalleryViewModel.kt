@@ -1,9 +1,12 @@
-package com.example.gallery
+package cn.chitanda.gallery.ui.gallery
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import cn.chitanda.gallery.data.model.PhotoItem
+import cn.chitanda.gallery.data.model.Pixabay
+import cn.chitanda.gallery.data.network.VolleySingleton
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
@@ -43,7 +46,8 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
     fun fetchData() {
         if (isLaoding) return
         if (currentPage > totalPage) {
-            _dataStatusLive.value = DATA_STATUS_NO_MORE
+            _dataStatusLive.value =
+                DATA_STATUS_NO_MORE
             return
         }
         isLaoding = true
@@ -65,11 +69,13 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
                 currentPage++
             },
             Response.ErrorListener {
-                _dataStatusLive.value = DATA_STATUS_NETWORK_ERROR
+                _dataStatusLive.value =
+                    DATA_STATUS_NETWORK_ERROR
                 isLaoding = false
             }
         )
-        VolleySingleton.getINSTANCE(getApplication()).requestQueue.add(stringRequest)
+        VolleySingleton.getINSTANCE(getApplication())
+            .requestQueue.add(stringRequest)
     }
 
     private fun getURL(): String {

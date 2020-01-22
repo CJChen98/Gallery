@@ -1,10 +1,8 @@
-package com.example.gallery
+package cn.chitanda.gallery.data.model
 
 import android.os.Parcelable
-import androidx.versionedparcelable.ParcelField
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
-import kotlinx.coroutines.FlowPreview
 
 data class Pixabay(
     val totalHits: String,

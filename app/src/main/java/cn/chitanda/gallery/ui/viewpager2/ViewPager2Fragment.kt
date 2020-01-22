@@ -1,21 +1,16 @@
-package com.example.gallery
+package cn.chitanda.gallery.ui.viewpager2
 
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.ContentValues
-import android.content.Context
-import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.*
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.get
@@ -23,13 +18,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
-import com.bumptech.glide.Glide
+import cn.chitanda.gallery.data.model.PhotoItem
+import com.chitanda.gallery.R
 import kotlinx.android.synthetic.main.fragment_view_pager2.*
-import kotlinx.android.synthetic.main.viewpager_itme.*
 import kotlinx.android.synthetic.main.viewpager_itme.view.*
 import kotlinx.coroutines.*
-import java.io.IOException
-import java.io.OutputStream
 
 /**
  * A simple [Fragment] subclass.

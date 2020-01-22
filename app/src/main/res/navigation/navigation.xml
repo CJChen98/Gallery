@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/galleryFragment"
-        android:name="com.example.gallery.GalleryFragment"
+        android:name="cn.chitanda.gallery.ui.gallery.GalleryFragment"
         android:label="Gallery"
         tools:layout="@layout/fragment_gallery">
         <action
@@ -18,7 +18,7 @@
     </fragment>
     <fragment
         android:id="@+id/viewPager2Fragment"
-        android:name="com.example.gallery.ViewPager2Fragment"
+        android:name="cn.chitanda.gallery.ui.viewpager2.ViewPager2Fragment"
         tools:layout="@layout/fragment_view_pager2">
         <action
             android:id="@+id/action_viewPager2Fragment_to_galleryFragment"

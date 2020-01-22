@@ -1,4 +1,4 @@
-package com.example.gallery
+package cn.chitanda.gallery.ui.viewpager2
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,10 +6,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import cn.chitanda.gallery.data.model.PhotoItem
 import com.bumptech.glide.Glide
+import com.chitanda.gallery.R
 import kotlinx.android.synthetic.main.viewpager_itme.view.*
 
-class ViewPagerAdapter : ListAdapter<PhotoItem, MViewHolder>(DIFFCALLBACK) {
+class ViewPagerAdapter : ListAdapter<PhotoItem, MViewHolder>(
+    DIFFCALLBACK
+) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MViewHolder {
         LayoutInflater.from(parent.context).inflate(R.layout.viewpager_itme, parent, false)
             .apply {

@@ -1,7 +1,9 @@
-package com.example.gallery
+package cn.chitanda.gallery.ui.gallery
 
 
 import android.content.Context
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.view.*
@@ -12,6 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.chitanda.gallery.R
 import kotlinx.android.synthetic.main.fragment_gallery.*
 
 
@@ -65,7 +68,8 @@ class GalleryFragment : Fragment() {
             this,
             ViewModelProvider.AndroidViewModelFactory(requireActivity().application)
         ).get(GalleryViewModel::class.java)
-        val galleryAdapter = GalleryAdapter(galleryViewModel)
+        val galleryAdapter =
+            GalleryAdapter(galleryViewModel)
         recyclerGallery.apply {
             adapter = galleryAdapter
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
