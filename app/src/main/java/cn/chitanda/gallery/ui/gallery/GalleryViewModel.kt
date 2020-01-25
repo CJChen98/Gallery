@@ -39,7 +39,7 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
     fun resetQuery() {
         currentPage = 1
         totalPage = 1
-        currentKey = ""
+        //currentKey = ""
         isNewQuery = true
         needToScrollToTop = true
         fetchData()

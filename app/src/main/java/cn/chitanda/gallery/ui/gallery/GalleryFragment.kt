@@ -37,13 +37,14 @@ class GalleryFragment : Fragment() {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 val string = query.toString().trim()
                 swipeLayoutGallery.isRefreshing = true
-                galleryViewModel.currentKey = string
+                // galleryViewModel.currentKey = string
                 galleryViewModel.resetQuery()
                 hideSoftInput(requireView())
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
+                galleryViewModel.currentKey = newText.toString().trim()
                 return false
             }
         })
@@ -91,6 +92,7 @@ class GalleryFragment : Fragment() {
 
         swipeLayoutGallery.setOnRefreshListener {
             galleryViewModel.resetQuery()
+            hideSoftInput(requireView())
         }
 
         recyclerGallery.addOnScrollListener(object : RecyclerView.OnScrollListener() {
