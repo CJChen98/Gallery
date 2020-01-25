@@ -141,11 +141,11 @@ class GalleryAdapter(val viewModel: GalleryViewModel) :
 
     object DIFFCALLBACK : DiffUtil.ItemCallback<PhotoItem>() {
         override fun areItemsTheSame(oldItem: PhotoItem, newItem: PhotoItem): Boolean {
-            return oldItem === newItem
+            return oldItem.photoId == newItem.photoId
         }
 
         override fun areContentsTheSame(oldItem: PhotoItem, newItem: PhotoItem): Boolean {
-            return oldItem.photoId == newItem.photoId
+            return oldItem == newItem
         }
 
     }

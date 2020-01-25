@@ -2,8 +2,6 @@ package cn.chitanda.gallery.ui.gallery
 
 
 import android.content.Context
-import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.view.*
@@ -56,6 +54,7 @@ class GalleryFragment : Fragment() {
             R.id.swipe -> {
                 swipeLayoutGallery.isRefreshing = true
                 Handler().postDelayed(Runnable { galleryViewModel.resetQuery() }, 1000)
+                hideSoftInput(requireView())
             }
         }
         return super.onOptionsItemSelected(item)
@@ -91,13 +90,7 @@ class GalleryFragment : Fragment() {
         })
 
         swipeLayoutGallery.setOnRefreshListener {
-            if (editText.text != null) {
-                val string = editText.text.toString()
-                galleryViewModel.currentKey = string
-                galleryViewModel.resetQuery()
-            } else {
-                galleryViewModel.resetQuery()
-            }
+            galleryViewModel.resetQuery()
         }
 
         recyclerGallery.addOnScrollListener(object : RecyclerView.OnScrollListener() {

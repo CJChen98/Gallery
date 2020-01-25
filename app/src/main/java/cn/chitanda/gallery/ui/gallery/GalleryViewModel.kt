@@ -1,6 +1,7 @@
 package cn.chitanda.gallery.ui.gallery
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -24,7 +25,7 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
     val photoListLive: LiveData<List<PhotoItem>>
         get() = _photoListLive
     var needToScrollToTop = true
-    private val perPage = 50
+    private val perPage = 20
     private var currentPage = 1
     private var totalPage = 1
     var currentKey = ""
@@ -38,6 +39,7 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
     fun resetQuery() {
         currentPage = 1
         totalPage = 1
+        currentKey = ""
         isNewQuery = true
         needToScrollToTop = true
         fetchData()
@@ -76,13 +78,11 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
         )
         VolleySingleton.getINSTANCE(getApplication())
             .requestQueue.add(stringRequest)
+        Log.d("cont", currentPage.toString())
     }
 
     private fun getURL(): String {
-        return "https://pixabay.com/api/?key=14598379-6f1338e6d1b1cbb8269b3abae&per_page=${perPage}&q=${currentKey}"
+        return "https://pixabay.com/api/?key=14598379-6f1338e6d1b1cbb8269b3abae&per_page=${perPage}&q=${currentKey}&page=${currentPage}"
     }
 
-    private fun getURL(string: String): String {
-        return "https://pixabay.com/api/?key=14598379-6f1338e6d1b1cbb8269b3abae&per_page=100&q=${string}"
-    }
 }
