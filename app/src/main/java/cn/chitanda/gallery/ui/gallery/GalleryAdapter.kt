@@ -94,7 +94,7 @@ class GalleryAdapter(val viewModel: GalleryViewModel) :
                         isClickable = false
                     }
                     DATA_STATUS_NETWORK_ERROR -> {
-                        progressBar.visibility = View.GONE
+                        progressBar.visibility = View.VISIBLE
                         textView.text = "网络错误,稍后再试"
                         isClickable = true
                     }

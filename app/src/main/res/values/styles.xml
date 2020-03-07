@@ -8,4 +8,11 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="SplashTheme" parent="AppTheme">
+        <item name="windowNoTitle">true</item><!--无标题-->
+        <item name="android:windowFullscreen">true</item><!--全屏-->
+        <item name="android:windowIsTranslucent">true</item><!--半透明-->
+        <item name="android:background">@drawable/splash_background</item>
+    </style>
+
 </resources>

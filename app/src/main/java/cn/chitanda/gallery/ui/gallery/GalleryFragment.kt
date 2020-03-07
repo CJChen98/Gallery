@@ -114,5 +114,4 @@ class GalleryFragment : Fragment() {
             requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
         manager?.hideSoftInputFromWindow(v.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
     }
-
 }
